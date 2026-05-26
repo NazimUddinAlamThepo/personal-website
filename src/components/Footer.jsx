@@ -8,6 +8,7 @@ const navLinks = [
   { label: 'Projects', href: '#projects'  },
   { label: 'Education',href: '#education' },
   { label: 'Research', href: '#research'  },
+  { label: 'Learning', href: '#learning'  },
   { label: 'Contact',  href: '#contact'   },
 ]
 
@@ -20,39 +21,50 @@ export default function Footer() {
 
   return (
     <footer className="bg-[var(--color-surface)] dark:bg-[#0d111e] border-t border-navy-50 dark:border-navy-900/50">
-      <div className="container-narrow section-pad py-12! px-4 sm:px-8 lg:px-16">
+      <div className="container-narrow px-4 sm:px-8 lg:px-16 py-12">
 
         <div className="flex flex-col items-center gap-8">
 
           {/* Logo & tagline */}
-          <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
             <p className="font-serif text-2xl font-semibold text-gradient mb-1">
               {personal.shortName}<span className="text-forest-500">.</span>
             </p>
             <p className="text-xs text-[var(--color-muted)] max-w-xs">
               Frontend Developer & ML Researcher based in Dhaka, Bangladesh.
             </p>
-          </div>
+          </motion.div>
 
           {/* Nav links */}
           <nav className="flex flex-wrap gap-5 justify-center">
-            {navLinks.map(l => (
-              <button
+            {navLinks.map((l, i) => (
+              <motion.button
                 key={l.href}
                 onClick={() => scrollTo(l.href)}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ y: -2 }}
                 className="text-xs text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300 transition-colors"
               >
                 {l.label}
-              </button>
+              </motion.button>
             ))}
           </nav>
 
           {/* Social icons */}
           <div className="flex gap-4">
             {[
-              { icon: <Github size={17}/>,   href: personal.github,   label: 'GitHub'   },
-              { icon: <Linkedin size={17}/>, href: personal.linkedin, label: 'LinkedIn' },
-              { icon: <Mail size={17}/>,     href: `mailto:${personal.email}`, label: 'Email' },
+              { icon: <Github size={17}/>,   href: personal.github,            label: 'GitHub'   },
+              { icon: <Linkedin size={17}/>, href: personal.linkedin,           label: 'LinkedIn' },
+              { icon: <Mail size={17}/>,     href: `mailto:${personal.email}`,  label: 'Email'    },
             ].map(s => (
               <motion.a
                 key={s.label}
@@ -60,10 +72,12 @@ export default function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={s.label}
-                whileHover={{ scale: 1.1, y: -2 }}
+                whileHover={{ scale: 1.15, y: -3 }}
+                whileTap={{ scale: 0.9 }}
                 className="w-9 h-9 rounded-full flex items-center justify-center
                            text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300
-                           border border-navy-100 dark:border-navy-800 hover:border-navy-300 transition-all"
+                           border border-navy-100 dark:border-navy-800 hover:border-navy-300
+                           hover:bg-navy-50 dark:hover:bg-navy-800/40 transition-all"
               >
                 {s.icon}
               </motion.a>

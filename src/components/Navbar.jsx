@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Menu, X } from 'lucide-react'
 import { personal } from '../data/portfolioData'
@@ -6,15 +7,18 @@ import { personal } from '../data/portfolioData'
 const links = [
   { label: 'About',    href: '#about'     },
   { label: 'Skills',   href: '#skills'    },
-  { label: 'Projects', href: '#projects'  },
+  { label: 'Projects', route: '/projects' },
   { label: 'Education',href: '#education' },
   { label: 'Research', href: '#research'  },
+  { label: 'Learning', route: '/learning' },
   { label: 'Contact',  href: '#contact'   },
 ]
 
 export default function Navbar({ dark, toggle }) {
   const [scrolled, setScrolled] = useState(false)
   const [open,     setOpen]     = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -28,6 +32,22 @@ export default function Navbar({ dark, toggle }) {
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleNavClick = (link) => {
+    setOpen(false)
+    if (link.route) {
+      navigate(link.route)
+    } else {
+      // If we're on home page, just scroll
+      if (location.pathname === '/') {
+        scrollTo(link.href)
+      } else {
+        // If we're on a different page, navigate to home first, then scroll
+        navigate('/')
+        setTimeout(() => scrollTo(link.href), 300)
+      }
+    }
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500
@@ -37,22 +57,22 @@ export default function Navbar({ dark, toggle }) {
     >
       <div className="container-wide px-4 sm:px-8 lg:px-16 flex items-center justify-between">
         {/* Logo */}
-        <motion.a
-          href="#"
-          onClick={e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-          className="font-serif text-xl font-semibold text-gradient"
-          whileHover={{ scale: 1.03 }}
+        <Link
+          to="/"
+          className="font-serif text-xl font-semibold text-gradient hover:opacity-80 transition-opacity"
         >
-          {personal.shortName}
-          <span className="text-forest-500 dark:text-forest-400">.</span>
-        </motion.a>
+          <motion.div whileHover={{ scale: 1.03 }}>
+            {personal.shortName}
+            <span className="text-forest-500 dark:text-forest-400">.</span>
+          </motion.div>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-7">
           {links.map(l => (
             <button
-              key={l.href}
-              onClick={() => scrollTo(l.href)}
+              key={l.label}
+              onClick={() => handleNavClick(l)}
               className="text-sm font-medium text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300
                          transition-colors duration-200 relative group"
             >
@@ -80,7 +100,14 @@ export default function Navbar({ dark, toggle }) {
 
           {/* Contact CTA (desktop) */}
           <motion.button
-            onClick={() => scrollTo('#contact')}
+            onClick={() => {
+              if (location.pathname === '/') {
+                scrollTo('#contact')
+              } else {
+                navigate('/')
+                setTimeout(() => scrollTo('#contact'), 300)
+              }
+            }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="hidden md:block px-4 py-2 text-xs font-semibold rounded-full
@@ -113,8 +140,8 @@ export default function Navbar({ dark, toggle }) {
             <div className="px-6 py-4 flex flex-col gap-4">
               {links.map(l => (
                 <button
-                  key={l.href}
-                  onClick={() => scrollTo(l.href)}
+                  key={l.label}
+                  onClick={() => handleNavClick(l)}
                   className="text-sm font-medium text-left text-[var(--color-muted)]
                              hover:text-navy-500 dark:hover:text-navy-300 transition-colors"
                 >
@@ -122,7 +149,15 @@ export default function Navbar({ dark, toggle }) {
                 </button>
               ))}
               <button
-                onClick={() => scrollTo('#contact')}
+                onClick={() => {
+                  setOpen(false)
+                  if (location.pathname === '/') {
+                    scrollTo('#contact')
+                  } else {
+                    navigate('/')
+                    setTimeout(() => scrollTo('#contact'), 100)
+                  }
+                }}
                 className="mt-1 w-full py-2.5 text-sm font-semibold rounded-full
                            bg-navy-500 text-white hover:bg-forest-500 transition-colors"
               >

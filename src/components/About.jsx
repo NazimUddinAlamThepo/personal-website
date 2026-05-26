@@ -1,11 +1,10 @@
-import { motion } from 'framer-motion'
-import { useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { MapPin, Mail, Phone, GraduationCap } from 'lucide-react'
+import { MapPin, Mail, Phone, GraduationCap, Download } from 'lucide-react'
 import { personal } from '../data/portfolioData'
 
 const containerVariants = {
-  hidden: {},
+  hidden:  {},
   visible: { transition: { staggerChildren: 0.12 } },
 }
 const itemVariants = {
@@ -57,14 +56,39 @@ export default function About() {
         >
           {/* Left – summary */}
           <motion.div variants={itemVariants} className="space-y-6">
-            {/* Avatar placeholder */}
+
+            {/* Profile card */}
             <div className="glass-card rounded-2xl p-6 flex items-center gap-5">
-              <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0
-                           bg-gradient-to-br from-navy-500 to-forest-500 text-white font-serif text-3xl font-bold"
-              >
-                N
+              {/* Animated avatar */}
+              <div className="relative flex-shrink-0">
+                {/* Outer pulse ring */}
+                <motion.div
+                  animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.2, 0.5] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                  className="absolute -inset-2 rounded-2xl"
+                  style={{ background: 'linear-gradient(135deg, rgba(26,58,107,0.25), rgba(13,107,58,0.25))' }}
+                />
+                {/* Middle ring */}
+                <motion.div
+                  animate={{ scale: [1, 1.06, 1], opacity: [0.6, 0.3, 0.6] }}
+                  transition={{ repeat: Infinity, duration: 3, delay: 0.5, ease: 'easeInOut' }}
+                  className="absolute -inset-1 rounded-2xl"
+                  style={{ background: 'linear-gradient(135deg, rgba(26,58,107,0.3), rgba(13,107,58,0.3))' }}
+                />
+                {/* Avatar */}
+                <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center
+                                bg-gradient-to-br from-navy-500 to-forest-500
+                                text-white font-serif text-3xl font-bold shadow-lg shadow-navy-500/30">
+                  N
+                </div>
+                {/* Status dot */}
+                <div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-forest-400
+                                border-2 border-white dark:border-[var(--color-bg)]
+                                flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-white" />
+                </div>
               </div>
+
               <div>
                 <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">{personal.fullName}</h3>
                 <p className="text-sm text-[var(--color-muted)] mt-0.5">{personal.title}</p>
@@ -72,23 +96,36 @@ export default function About() {
                   <MapPin size={12} />
                   {personal.location}
                 </div>
+                {/* Mini status badge */}
+                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+                                bg-forest-50 dark:bg-forest-900/20 border border-forest-200 dark:border-forest-800/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-forest-500 animate-pulse" />
+                  <span className="text-[10px] font-semibold text-forest-600 dark:text-forest-400 uppercase tracking-wide">
+                    Available for hire
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Bio */}
-            <div className="glass-card rounded-2xl p-6">
-              <h4 className="font-semibold text-sm text-navy-500 dark:text-navy-300 uppercase tracking-wider mb-3">
+            <motion.div
+              variants={itemVariants}
+              className="glass-card rounded-2xl p-6"
+            >
+              <h4 className="font-semibold text-xs text-navy-500 dark:text-navy-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span className="w-4 h-0.5 bg-gradient-to-r from-navy-500 to-forest-500 rounded-full" />
                 Bio
               </h4>
               <p className="text-sm leading-7 text-[var(--color-muted)]">
                 {personal.about}
               </p>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Right – contact info */}
           <motion.div variants={itemVariants} className="glass-card rounded-2xl p-6">
-            <h4 className="font-semibold text-sm text-navy-500 dark:text-navy-300 uppercase tracking-wider mb-4">
+            <h4 className="font-semibold text-xs text-navy-500 dark:text-navy-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span className="w-4 h-0.5 bg-gradient-to-r from-navy-500 to-forest-500 rounded-full" />
               Quick Info
             </h4>
             <InfoRow icon={<Mail size={15}/>}          label="Email"      value={personal.email} />
@@ -98,16 +135,18 @@ export default function About() {
             <InfoRow icon={<span className="text-base">🌐</span>} label="Languages" value="Bangla (Native) · English (Professional)" />
             <InfoRow icon={<span className="text-base">💼</span>} label="Status"    value="Open to Internships & Collaborations" />
 
-            {/* Download CV button */}
-            <a
+            {/* Download CV */}
+            <motion.a
               href="/cv.pdf"
               download
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.97 }}
               className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-xl
                          bg-navy-500 dark:bg-navy-400 text-white text-sm font-semibold
-                         hover:bg-forest-500 transition-colors duration-300"
+                         hover:bg-forest-500 transition-colors duration-300 shadow-lg shadow-navy-500/20"
             >
-              Download CV
-            </a>
+              <Download size={15} /> Download CV
+            </motion.a>
           </motion.div>
         </motion.div>
       </div>
