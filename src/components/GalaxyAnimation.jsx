@@ -423,13 +423,13 @@ export default function GalaxyAnimation({ dark = true }) {
           <span className="text-blue-600 dark:text-blue-300">Md. </span>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 
                           dark:from-blue-400 dark:to-purple-400">
-            Nazimuddin
+            Mahi
           </span>
           <br />
           <span className="text-blue-600 dark:text-blue-300">Alam </span>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600
                           dark:from-blue-400 dark:to-purple-400">
-            Thepo
+            Dipu
           </span>
         </motion.h1>
 

@@ -101,10 +101,10 @@ export default function Hero() {
           className="font-serif text-5xl sm:text-6xl md:text-7xl font-semibold leading-tight mb-6"
         >
           <span className="text-[var(--color-text)]">Md. </span>
-          <span className="text-gradient">Nazimuddin</span>
+          <span className="text-gradient">Mahi</span>
           <br />
           <span className="text-[var(--color-text)]">Alam </span>
-          <span className="text-gradient">Thepo</span>
+          <span className="text-gradient">Dipu</span>
         </motion.h1>
 
         {/* Typewriter role row */}

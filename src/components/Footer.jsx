@@ -96,7 +96,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-xs text-[var(--color-muted)] text-center flex items-center gap-1 flex-wrap justify-center">
-            © {year} Md. Nazimuddin Alam Thepo. Built with
+            © {year} Md. Mahi Alam Dipu. Built with
             <Heart size={11} className="text-red-400 mx-0.5" fill="currentColor" />
             using React + Tailwind + Framer Motion.
           </p>

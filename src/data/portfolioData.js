@@ -3,9 +3,9 @@
 // ─────────────────────────────────────────────────────────
 
 export const personal = {
-  fullName:    'Md. Nazimuddin Alam Thepo',
-  shortName:   'Nazimuddin',
-  nickname:    'Thepo',
+  fullName:    'Md. Mahi Alam Dipu',
+  shortName:   'Dipu',
+  nickname:    'Dipu',
   title:       'Frontend Developer & ML Researcher',
   subtitle:    'Building elegant web experiences. Exploring intelligence through code.',
   email:       'mahialamdipu2003@gmail.com',
@@ -13,7 +13,7 @@ export const personal = {
   location:    'Dhaka, Bangladesh',
   university:  'RUET — Rajshahi University of Engineering & Technology',
   linkedin:    'https://linkedin.com/in/your-linkedin',
-  github:      'https://github.com/NazimUddinAlamThepo',
+  github:      'https://github.com/MahiAlamThepo',
   whatsapp:    'https://wa.me/8801836739301',
 
   // Hero CTA
