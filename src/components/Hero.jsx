@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { ArrowDown, Github, Linkedin, Mail } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Github, Linkedin, Mail, ArrowDown } from 'lucide-react'
 import { personal } from '../data/portfolioData'
 import { useState, useEffect } from 'react'
 
@@ -13,7 +14,7 @@ const ROLES = [
 function TypewriterRoles() {
   const [idx,   setIdx]   = useState(0)
   const [text,  setText]  = useState('')
-  const [phase, setPhase] = useState('typing') // typing | pausing | deleting
+  const [phase, setPhase] = useState('typing') // typing | deleting
 
   useEffect(() => {
     const target = ROLES[idx]
@@ -51,8 +52,6 @@ const fadeUp = (delay = 0) => ({
 })
 
 export default function Hero() {
-  const scrollTo = (id) => document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
-
   return (
     <section
       id="hero"
@@ -128,27 +127,29 @@ export default function Hero() {
           "{personal.heroTagline}"
         </motion.p>
 
-        {/* CTA buttons */}
+        {/* CTA buttons — now use Link for router navigation */}
         <motion.div {...fadeUp(0.48)} className="flex flex-wrap gap-4 justify-center mb-12">
-          <motion.button
-            onClick={() => scrollTo('#about')}
-            whileHover={{ scale: 1.06, y: -3, boxShadow: '0 20px 40px rgba(26,58,107,0.28)' }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3.5 rounded-full bg-navy-500 dark:bg-navy-400 text-white
-                       text-sm font-semibold shadow-lg shadow-navy-500/25 hover:bg-forest-500 transition-all duration-300"
-          >
-            View Profile
-          </motion.button>
-          <motion.button
-            onClick={() => scrollTo('#contact')}
-            whileHover={{ scale: 1.06, y: -3 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3.5 rounded-full border-2 border-navy-500/30 dark:border-navy-400/30
-                       text-navy-500 dark:text-navy-300 text-sm font-semibold
-                       hover:bg-navy-500 hover:text-white dark:hover:bg-navy-400 transition-all duration-300"
-          >
-            Contact Me
-          </motion.button>
+          <Link to="/about">
+            <motion.div
+              whileHover={{ scale: 1.06, y: -3, boxShadow: '0 20px 40px rgba(26,58,107,0.28)' }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-3.5 rounded-full bg-navy-500 dark:bg-navy-400 text-white
+                         text-sm font-semibold shadow-lg shadow-navy-500/25 hover:bg-forest-500 transition-all duration-300 cursor-pointer"
+            >
+              View Profile
+            </motion.div>
+          </Link>
+          <Link to="/contact">
+            <motion.div
+              whileHover={{ scale: 1.06, y: -3 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-3.5 rounded-full border-2 border-navy-500/30 dark:border-navy-400/30
+                         text-navy-500 dark:text-navy-300 text-sm font-semibold
+                         hover:bg-navy-500 hover:text-white dark:hover:bg-navy-400 transition-all duration-300 cursor-pointer"
+            >
+              Contact Me
+            </motion.div>
+          </Link>
         </motion.div>
 
         {/* Social icons */}
@@ -176,24 +177,25 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.button
-        onClick={() => scrollTo('#about')}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4, duration: 0.6 }}
-        className="absolute bottom-10 flex flex-col items-center gap-2
-                   text-[var(--color-muted)] hover:text-navy-500 transition-colors"
-        aria-label="Scroll down"
-      >
-        <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">Scroll</span>
+      {/* Scroll indicator — links to About page */}
+      <Link to="/about">
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4, duration: 0.6 }}
+          className="absolute bottom-10 flex flex-col items-center gap-2
+                     text-[var(--color-muted)] hover:text-navy-500 transition-colors cursor-pointer"
+          aria-label="Go to About"
         >
-          <ArrowDown size={18} />
+          <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          >
+            <ArrowDown size={18} />
+          </motion.div>
         </motion.div>
-      </motion.button>
+      </Link>
     </section>
   )
 }

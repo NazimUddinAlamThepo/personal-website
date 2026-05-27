@@ -1,14 +1,11 @@
 import { useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { ExternalLink, Github, Star, ArrowUpRight, ArrowLeft } from 'lucide-react'
+import { ExternalLink, Github, Star, ArrowUpRight } from 'lucide-react'
 import { projects } from '../data/portfolioData'
 
 const categories = ['All', 'AI / ML', 'Full-Stack Web', 'Backend']
 
 export default function Projects() {
-  const location = useLocation()
-  const isProjectsPage = location.pathname === '/projects'
   const ref    = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
   const [active, setActive] = useState('All')
@@ -16,22 +13,8 @@ export default function Projects() {
   const filtered = active === 'All' ? projects : projects.filter(p => p.category === active)
 
   return (
-    <section id="projects" className={`${isProjectsPage ? 'min-h-screen' : 'section-pad'} bg-[var(--color-bg)] ${isProjectsPage ? 'pt-32 pb-20' : ''}`}>
+    <section id="projects" className="section-pad bg-[var(--color-bg)]">
       <div className="container-wide">
-
-        {/* Back button (on dedicated page) */}
-        {isProjectsPage && (
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 mb-8 px-3 py-2 rounded-lg
-                       text-sm font-medium text-navy-600 dark:text-navy-300
-                       hover:bg-navy-50 dark:hover:bg-navy-900/20
-                       transition-colors duration-200"
-          >
-            <ArrowLeft size={16} />
-            Back to Home
-          </Link>
-        )}
 
         {/* Heading */}
         <motion.div
@@ -95,7 +78,7 @@ export default function Projects() {
                            transition-shadow duration-300
                            hover:shadow-xl hover:shadow-navy-500/10 dark:hover:shadow-black/30"
               >
-                {/* Top accent bar — animates width on hover */}
+                {/* Top accent bar */}
                 <div className="relative h-1.5 w-full overflow-hidden">
                   <div className={`absolute inset-0 ${p.color === 'forest'
                     ? 'bg-gradient-to-r from-forest-400 to-forest-600'

@@ -1,23 +1,21 @@
 import { motion } from 'framer-motion'
+import { NavLink, Link } from 'react-router-dom'
 import { Github, Linkedin, Mail, Heart } from 'lucide-react'
 import { personal } from '../data/portfolioData'
 
 const navLinks = [
-  { label: 'About',    href: '#about'     },
-  { label: 'Skills',   href: '#skills'    },
-  { label: 'Projects', href: '#projects'  },
-  { label: 'Education',href: '#education' },
-  { label: 'Research', href: '#research'  },
-  { label: 'Learning', href: '#learning'  },
-  { label: 'Contact',  href: '#contact'   },
+  { label: 'About',          route: '/about'          },
+  { label: 'Skills',         route: '/skills'         },
+  { label: 'Projects',       route: '/projects'       },
+  { label: 'Education',      route: '/education'      },
+  { label: 'Research',       route: '/research'       },
+  { label: 'Certifications', route: '/certifications' },
+  { label: 'Learning',       route: '/learning'       },
+  { label: 'Contact',        route: '/contact'        },
 ]
 
 export default function Footer() {
   const year = new Date().getFullYear()
-
-  const scrollTo = (href) => {
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-  }
 
   return (
     <footer className="bg-[var(--color-surface)] dark:bg-[#0d111e] border-t border-navy-50 dark:border-navy-900/50">
@@ -33,29 +31,38 @@ export default function Footer() {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <p className="font-serif text-2xl font-semibold text-gradient mb-1">
+            <Link to="/" className="font-serif text-2xl font-semibold text-gradient mb-1 inline-block">
               {personal.shortName}<span className="text-forest-500">.</span>
-            </p>
+            </Link>
             <p className="text-xs text-[var(--color-muted)] max-w-xs">
-              Frontend Developer & ML Researcher based in Dhaka, Bangladesh.
+              Frontend Developer &amp; ML Researcher based in Dhaka, Bangladesh.
             </p>
           </motion.div>
 
           {/* Nav links */}
-          <nav className="flex flex-wrap gap-5 justify-center">
+          <nav className="flex flex-wrap gap-4 justify-center">
             {navLinks.map((l, i) => (
-              <motion.button
-                key={l.href}
-                onClick={() => scrollTo(l.href)}
+              <motion.div
+                key={l.route}
                 initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -2 }}
-                className="text-xs text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300 transition-colors"
               >
-                {l.label}
-              </motion.button>
+                <NavLink
+                  to={l.route}
+                  className={({ isActive }) =>
+                    `text-xs transition-colors ${
+                      isActive
+                        ? 'text-navy-500 dark:text-navy-300 font-semibold'
+                        : 'text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300'
+                    }`
+                  }
+                >
+                  {l.label}
+                </NavLink>
+              </motion.div>
             ))}
           </nav>
 

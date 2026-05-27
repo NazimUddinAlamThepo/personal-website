@@ -1,12 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
-  BookOpen, Calendar, Lightbulb, Target, Zap, ArrowLeft,
+  BookOpen, Calendar, Lightbulb, Target, Zap,
   ChevronDown, ChevronUp, X, Plus, Hash, Send,
-  Pencil, Globe, Flame,
+  Pencil, Globe, Flame, AlertCircle, Loader,
 } from 'lucide-react'
-import { learningPosts, personal } from '../data/portfolioData'
+import { personal } from '../data/portfolioData'
+import { 
+  fetchAllLearningPosts, 
+  createLearningPost,
+  deleteLearningPost,
+  updateLearningPost,
+  togglePostPin 
+} from '../services/learningApi'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const CATEGORIES = ['All', 'ML / AI', 'Frontend', 'DSA', 'Tools', 'Backend']
@@ -70,8 +76,8 @@ function RichText({ text }) {
 }
 
 // ── PostCard  (LinkedIn-style) ────────────────────────────────────────────────
-function PostCard({ post, index, onReact }) {
-  const [expanded,    setExpanded]   = useState(false)
+function PostCard({ post, index, onDelete, onPin }) {
+  const [expanded, setExpanded] = useState(false)
   const ref    = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-50px' })
 
@@ -134,7 +140,6 @@ function PostCard({ post, index, onReact }) {
           {/* Category badge */}
           <span className={`flex-shrink-0 inline-flex items-center gap-1 text-[11px] px-2.5 py-1
                            rounded-full border font-medium ${CATEGORY_COLORS[post.category] ?? ''}`}>
-            <span>{post.emoji}</span>
             <span className="hidden sm:inline">{post.category}</span>
           </span>
         </div>
@@ -176,6 +181,29 @@ function PostCard({ post, index, onReact }) {
           </div>
         )}
 
+        {/* ── Actions ── */}
+        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-black/5 dark:border-white/8">
+          <motion.button
+            onClick={() => onPin(post._id)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all ${
+              post.pinned
+                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                : 'text-[var(--color-muted)] hover:bg-black/5 dark:hover:bg-white/10'
+            }`}
+          >
+            <Flame size={12} /> {post.pinned ? 'Pinned' : 'Pin'}
+          </motion.button>
+          <motion.button
+            onClick={() => onDelete(post._id)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg text-[var(--color-muted)] hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all ml-auto"
+          >
+            <X size={12} /> Delete
+          </motion.button>
+        </div>
 
       </div>
     </motion.article>
@@ -189,20 +217,17 @@ function NewPostModal({ onClose, onSubmit }) {
   })
   const textareaRef = useRef(null)
 
-  // Auto-focus content area
   useEffect(() => { textareaRef.current?.focus() }, [])
 
   const handle = () => {
     if (!form.title.trim() || !form.content.trim()) return
-    onSubmit({
-      id:        Date.now(),
-      date:      new Date().toISOString().split('T')[0],
-      category:  form.category,
-      tags:      form.tags.split(',').map(t => t.trim()).filter(Boolean),
-      title:     form.title,
-      content:   form.content,
-      pinned:    false,
-    })
+    const newPost = {
+      title: form.title,
+      content: form.content,
+      category: form.category,
+      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+    }
+    onSubmit(newPost)
     onClose()
   }
 
@@ -337,7 +362,7 @@ function NewPostModal({ onClose, onSubmit }) {
   )
 }
 
-// ── Write-a-post prompt (LinkedIn top bar) ────────────────────────────────────
+// ── Write-a-post prompt ───────────────────────────────────────────────────────
 function WritePrompt({ onOpen }) {
   return (
     <motion.div
@@ -375,35 +400,70 @@ function WritePrompt({ onOpen }) {
 
 // ── Main section ──────────────────────────────────────────────────────────────
 export default function LearningLog() {
-  const location = useLocation()
-  const isLearningPage = location.pathname === '/learning'
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [filter, setFilter] = useState('All')
+  const [showModal, setModal] = useState(false)
 
-  // ── State with localStorage persistence ─────
-  const [posts, setPosts] = useState(() => {
-    try {
-      const saved = localStorage.getItem('learning-log-posts')
-      return saved ? JSON.parse(saved) : learningPosts
-    } catch {
-      return learningPosts
-    }
-  })
-
-  const [filter,    setFilter]   = useState('All')
-  const [showModal, setModal]    = useState(false)
-
-  // Persist to localStorage whenever posts change
+  // Fetch posts from backend
   useEffect(() => {
-    try {
-      localStorage.setItem('learning-log-posts', JSON.stringify(posts))
-    } catch {}
-  }, [posts])
+    const loadPosts = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await fetchAllLearningPosts()
+        setPosts(data || [])
+      } catch (err) {
+        console.error('Failed to load posts:', err)
+        setError('Failed to load learning posts. Please try again.')
+        setPosts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadPosts()
+  }, [])
 
   const handleReact = useCallback((postId, emoji, delta) => {
-    setPosts(prev => prev.map(p =>
-      p.id === postId
-        ? { ...p, reactions: { ...p.reactions, [emoji]: Math.max(0, (p.reactions[emoji] ?? 0) + delta) } }
-        : p
-    ))
+    // Removed - reactions feature is no longer used
+  }, [])
+
+  const handleCreatePost = useCallback(async (newPostData) => {
+    try {
+      const createdPost = await createLearningPost({
+        title: newPostData.title,
+        content: newPostData.content,
+        category: newPostData.category,
+        tags: newPostData.tags,
+        date: new Date(),
+        pinned: false
+      })
+      setPosts(prev => [createdPost, ...prev])
+    } catch (err) {
+      console.error('Failed to create post:', err)
+      alert('Failed to create post. Please try again.')
+    }
+  }, [])
+
+  const handleDeletePost = useCallback(async (postId) => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return
+    try {
+      await deleteLearningPost(postId)
+      setPosts(prev => prev.filter(p => p._id !== postId))
+    } catch (err) {
+      console.error('Failed to delete post:', err)
+      alert('Failed to delete post. Please try again.')
+    }
+  }, [])
+
+  const handleTogglePin = useCallback(async (postId) => {
+    try {
+      const updated = await togglePostPin(postId)
+      setPosts(prev => prev.map(p => p._id === postId ? updated : p))
+    } catch (err) {
+      console.error('Failed to toggle pin:', err)
+    }
   }, [])
 
   const filtered = filter === 'All' ? posts : posts.filter(p => p.category === filter)
@@ -412,7 +472,7 @@ export default function LearningLog() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section id="learning" className={`${isLearningPage ? 'min-h-screen' : 'section-pad'} relative overflow-hidden ${isLearningPage ? 'pt-32 pb-20' : ''}`}>
+    <section id="learning" className="section-pad relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px
@@ -422,20 +482,6 @@ export default function LearningLog() {
       </div>
 
       <div className="container-wide relative z-10">
-
-        {/* Back button (on dedicated page) */}
-        {isLearningPage && (
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 mb-8 px-3 py-2 rounded-lg
-                       text-sm font-medium text-navy-600 dark:text-navy-300
-                       hover:bg-navy-50 dark:hover:bg-navy-900/20
-                       transition-colors duration-200"
-          >
-            <ArrowLeft size={16} />
-            Back to Home
-          </Link>
-        )}
 
         {/* ── Section header ── */}
         <motion.div
@@ -541,44 +587,62 @@ export default function LearningLog() {
             </motion.button>
           </motion.div>
 
-          {/* Feed */}
-          <AnimatePresence mode="wait">
+          {/* Error message */}
+          {error && (
             <motion.div
-              key={filter}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-4"
+              className="mb-6 p-4 rounded-xl bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-3"
             >
-              {filtered.map((post, i) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  index={i}
-                  onReact={handleReact}
-                />
-              ))}
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Empty state */}
-          {filtered.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-20 text-[var(--color-muted)]"
-            >
-              <BookOpen size={40} className="mx-auto mb-3 opacity-25" />
-              <p className="text-sm font-medium">No entries in this category yet.</p>
-              <button
-                onClick={() => setModal(true)}
-                className="mt-3 text-xs text-navy-500 dark:text-navy-300 hover:underline"
-              >
-                Add your first one →
-              </button>
+              <AlertCircle size={18} className="text-red-600 dark:text-red-400 flex-shrink-0" />
+              <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
             </motion.div>
           )}
+
+          {/* Feed */}
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <div key="loading" className="flex items-center justify-center py-20">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Loader size={32} className="text-navy-500 dark:text-navy-300" />
+                </motion.div>
+              </div>
+            ) : filtered.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-16"
+              >
+                <BookOpen size={48} className="mx-auto mb-4 text-[var(--color-muted)]/30" />
+                <p className="text-[var(--color-muted)]">No learning posts yet.</p>
+                <p className="text-sm text-[var(--color-muted)]/70 mt-2">Click "Write" to share your first learning!</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`posts-${filter}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-4"
+              >
+                {filtered.map((post, i) => (
+                  <PostCard
+                    key={post._id}
+                    post={post}
+                    index={i}
+                    onDelete={handleDeletePost}
+                    onPin={handleTogglePin}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -587,8 +651,8 @@ export default function LearningLog() {
         {showModal && (
           <NewPostModal
             onClose={() => setModal(false)}
-            onSubmit={post => {
-              setPosts(prev => [post, ...prev])
+            onSubmit={async (post) => {
+              await handleCreatePost(post)
               setFilter('All')
             }}
           />

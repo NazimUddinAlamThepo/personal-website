@@ -1,24 +1,31 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Menu, X } from 'lucide-react'
 import { personal } from '../data/portfolioData'
 
 const links = [
-  { label: 'About',    href: '#about'     },
-  { label: 'Skills',   href: '#skills'    },
-  { label: 'Projects', route: '/projects' },
-  { label: 'Education',href: '#education' },
-  { label: 'Research', href: '#research'  },
-  { label: 'Learning', route: '/learning' },
-  { label: 'Contact',  href: '#contact'   },
+  { label: 'Home',           route: '/'               },
+  { label: 'About',          route: '/about'          },
+  { label: 'Skills',         route: '/skills'         },
+  { label: 'Projects',       route: '/projects'       },
+  { label: 'Education',      route: '/education'      },
+  { label: 'Research',       route: '/research'       },
+  { label: 'Certifications', route: '/certifications' },
+  { label: 'Learning',       route: '/learning'       },
+  { label: 'Contact',        route: '/contact'        },
 ]
+
+// Active link style helper for NavLink className prop
+const navLinkClass = ({ isActive }) =>
+  `text-sm font-medium transition-colors duration-200 relative group
+   ${isActive
+     ? 'text-navy-600 dark:text-navy-300 font-semibold'
+     : 'text-navy-700 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300'}`
 
 export default function Navbar({ dark, toggle }) {
   const [scrolled, setScrolled] = useState(false)
   const [open,     setOpen]     = useState(false)
-  const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -26,60 +33,47 @@ export default function Navbar({ dark, toggle }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const scrollTo = (href) => {
-    setOpen(false)
-    const el = document.querySelector(href)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const handleNavClick = (link) => {
-    setOpen(false)
-    if (link.route) {
-      navigate(link.route)
-    } else {
-      // If we're on home page, just scroll
-      if (location.pathname === '/') {
-        scrollTo(link.href)
-      } else {
-        // If we're on a different page, navigate to home first, then scroll
-        navigate('/')
-        setTimeout(() => scrollTo(link.href), 300)
-      }
-    }
-  }
+  // Close mobile menu whenever a link is clicked
+  const closeMenu = () => setOpen(false)
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500
         ${scrolled
-          ? 'glass border-b border-white/60 dark:border-white/8 shadow-sm py-3'
+          ? 'backdrop-blur-md bg-white/70 dark:bg-blue-950/40 border-b border-navy-200 dark:border-white/8 shadow-sm py-3'
           : 'bg-transparent py-5'}`}
     >
       <div className="container-wide px-4 sm:px-8 lg:px-16 flex items-center justify-between">
+
         {/* Logo */}
-        <Link
-          to="/"
-          className="font-serif text-xl font-semibold text-gradient hover:opacity-80 transition-opacity"
-        >
-          <motion.div whileHover={{ scale: 1.03 }}>
-            {personal.shortName}
-            <span className="text-forest-500 dark:text-forest-400">.</span>
-          </motion.div>
-        </Link>
+        <div className="inline-block">
+          <Link
+            to="/"
+            className="font-serif text-xl font-semibold inline-block"
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              className="text-gradient hover:brightness-110 transition-all duration-200 cursor-pointer"
+            >
+              {personal.shortName}
+              <span className="text-forest-500 dark:text-forest-400">.</span>
+            </motion.div>
+          </Link>
+        </div>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden md:flex items-center gap-6">
           {links.map(l => (
-            <button
+            <NavLink
               key={l.label}
-              onClick={() => handleNavClick(l)}
-              className="text-sm font-medium text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300
-                         transition-colors duration-200 relative group"
+              to={l.route}
+              className={navLinkClass}
             >
               {l.label}
               <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-navy-500 dark:bg-navy-300
                                group-hover:w-full transition-all duration-300 rounded-full" />
-            </button>
+            </NavLink>
           ))}
         </nav>
 
@@ -91,34 +85,25 @@ export default function Navbar({ dark, toggle }) {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             className="w-9 h-9 rounded-full flex items-center justify-center
-                       text-[var(--color-muted)] hover:text-navy-500 dark:hover:text-navy-300
-                       hover:bg-navy-50 dark:hover:bg-navy-800 transition-all"
+                       text-navy-600 dark:text-slate-300 hover:text-navy-700 dark:hover:text-navy-300
+                       hover:bg-navy-100 dark:hover:bg-navy-800 transition-all"
             aria-label="Toggle theme"
           >
             {dark ? <Sun size={17} /> : <Moon size={17} />}
           </motion.button>
 
-          {/* Contact CTA (desktop) */}
-          <motion.button
-            onClick={() => {
-              if (location.pathname === '/') {
-                scrollTo('#contact')
-              } else {
-                navigate('/')
-                setTimeout(() => scrollTo('#contact'), 300)
-              }
-            }}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+          {/* Hire Me CTA (desktop) */}
+          <NavLink
+            to="/contact"
             className="hidden md:block px-4 py-2 text-xs font-semibold rounded-full
-                       bg-navy-500 dark:bg-navy-400 text-white hover:bg-forest-500 transition-colors duration-300"
+                       bg-navy-600 dark:bg-navy-500 text-white hover:bg-navy-700 dark:hover:bg-navy-600 transition-colors duration-300"
           >
             Hire Me
-          </motion.button>
+          </NavLink>
 
           {/* Hamburger */}
           <button
-            className="md:hidden w-9 h-9 flex items-center justify-center text-[var(--color-muted)]"
+            className="md:hidden w-9 h-9 flex items-center justify-center text-navy-600 dark:text-slate-300"
             onClick={() => setOpen(o => !o)}
             aria-label="Toggle menu"
           >
@@ -135,34 +120,33 @@ export default function Navbar({ dark, toggle }) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden overflow-hidden glass border-t border-white/60 dark:border-white/8"
+            className="md:hidden overflow-hidden backdrop-blur-md bg-white/80 dark:bg-blue-950/50 border-t border-navy-200 dark:border-white/8"
           >
-            <div className="px-6 py-4 flex flex-col gap-4">
+            <div className="px-6 py-4 flex flex-col gap-1">
               {links.map(l => (
-                <button
+                <NavLink
                   key={l.label}
-                  onClick={() => handleNavClick(l)}
-                  className="text-sm font-medium text-left text-[var(--color-muted)]
-                             hover:text-navy-500 dark:hover:text-navy-300 transition-colors"
+                  to={l.route}
+                  onClick={closeMenu}
+                  className={({ isActive }) =>
+                    `text-sm font-medium py-2.5 px-3 rounded-lg transition-all duration-200
+                     ${isActive
+                       ? 'text-navy-600 dark:text-navy-300 bg-navy-100 dark:bg-navy-800/40 font-semibold'
+                       : 'text-navy-700 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-800/20'}`
+                  }
                 >
                   {l.label}
-                </button>
+                </NavLink>
               ))}
-              <button
-                onClick={() => {
-                  setOpen(false)
-                  if (location.pathname === '/') {
-                    scrollTo('#contact')
-                  } else {
-                    navigate('/')
-                    setTimeout(() => scrollTo('#contact'), 100)
-                  }
-                }}
-                className="mt-1 w-full py-2.5 text-sm font-semibold rounded-full
-                           bg-navy-500 text-white hover:bg-forest-500 transition-colors"
+
+              <NavLink
+                to="/contact"
+                onClick={closeMenu}
+                className="mt-2 w-full py-2.5 text-sm font-semibold rounded-full text-center text-white
+                           bg-navy-600 dark:bg-navy-500 hover:bg-navy-700 dark:hover:bg-navy-600 transition-colors"
               >
                 Hire Me
-              </button>
+              </NavLink>
             </div>
           </motion.nav>
         )}
