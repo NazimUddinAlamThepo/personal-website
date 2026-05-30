@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Menu, X } from 'lucide-react'
 import { personal } from '../data/portfolioData'
@@ -13,6 +13,7 @@ const links = [
   { label: 'Research',       route: '/research'       },
   { label: 'Certifications', route: '/certifications' },
   { label: 'Learning',       route: '/learning'       },
+  { label: 'Deep Focus',     route: '/deep-focus'     },
   { label: 'Contact',        route: '/contact'        },
 ]
 
@@ -26,6 +27,28 @@ const navLinkClass = ({ isActive }) =>
 export default function Navbar({ dark, toggle }) {
   const [scrolled, setScrolled] = useState(false)
   const [open,     setOpen]     = useState(false)
+  const navigate = useNavigate()
+
+  function isActiveFocusSession() {
+    try {
+      const raw = localStorage.getItem('deep-focus-active-session')
+      if (!raw) return false
+      const parsed = JSON.parse(raw)
+      return parsed?.status === 'running'
+    } catch {
+      return false
+    }
+  }
+
+  const handleNavClick = (event, route) => {
+    if (typeof window === 'undefined') return
+    if (isActiveFocusSession()) {
+      event.preventDefault()
+      setOpen(false)
+      navigate('/deep-focus/active')
+      return
+    }
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -49,6 +72,7 @@ export default function Navbar({ dark, toggle }) {
         <div className="inline-block">
           <Link
             to="/"
+            onClick={(e) => handleNavClick(e, '/')}
             className="font-serif text-xl font-semibold inline-block"
           >
             <motion.div
@@ -68,6 +92,7 @@ export default function Navbar({ dark, toggle }) {
             <NavLink
               key={l.label}
               to={l.route}
+              onClick={(e) => handleNavClick(e, l.route)}
               className={navLinkClass}
             >
               {l.label}
@@ -127,14 +152,14 @@ export default function Navbar({ dark, toggle }) {
                 <NavLink
                   key={l.label}
                   to={l.route}
-                  onClick={closeMenu}
+                  onClick={(e) => { handleNavClick(e, l.route); closeMenu() }}
                   className={({ isActive }) =>
                     `text-sm font-medium py-2.5 px-3 rounded-lg transition-all duration-200
                      ${isActive
                        ? 'text-navy-600 dark:text-navy-300 bg-navy-100 dark:bg-navy-800/40 font-semibold'
-                       : 'text-navy-700 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-800/20'}`
-                  }
-                >
+                        : 'text-navy-700 dark:text-slate-300 hover:text-navy-600 dark:hover:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-800/20'}`
+                        }
+                      >
                   {l.label}
                 </NavLink>
               ))}

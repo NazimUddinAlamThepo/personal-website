@@ -1,15 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { Github, Linkedin, Mail, ArrowDown, Code2, Cpu, Zap, Database, Smartphone, BarChart3 } from 'lucide-react'
-import { personal } from '../data/portfolioData'
-
-const ROLES = [
-  'Frontend Developer',
-  'ML Researcher',
-  'React Engineer',
-  'Full-Stack Builder',
-]
+import { Code2, Cpu, Zap, Database, Smartphone, BarChart3 } from 'lucide-react'
+import HeroContent from './HeroContent'
 
 const TECH_ICONS = [
   { Icon: Code2, label: 'Code' },
@@ -19,46 +11,6 @@ const TECH_ICONS = [
   { Icon: Smartphone, label: 'Mobile' },
   { Icon: BarChart3, label: 'Analytics' },
 ]
-
-function TypewriterRoles() {
-  const [idx,   setIdx]   = useState(0)
-  const [text,  setText]  = useState('')
-  const [phase, setPhase] = useState('typing')
-
-  useEffect(() => {
-    const target = ROLES[idx]
-    let t
-
-    if (phase === 'typing') {
-      if (text.length < target.length) {
-        t = setTimeout(() => setText(target.slice(0, text.length + 1)), 75)
-      } else {
-        t = setTimeout(() => setPhase('deleting'), 2200)
-      }
-    } else {
-      if (text.length > 0) {
-        t = setTimeout(() => setText(s => s.slice(0, -1)), 38)
-      } else {
-        setIdx(i => (i + 1) % ROLES.length)
-        setPhase('typing')
-      }
-    }
-    return () => clearTimeout(t)
-  }, [text, phase, idx])
-
-  return (
-    <span className="inline-flex items-center gap-0.5 text-gradient font-semibold">
-      <span>{text}</span>
-      <span className="inline-block w-[2px] h-5 bg-navy-500 dark:bg-navy-300 animate-blink rounded-full align-middle ml-0.5" />
-    </span>
-  )
-}
-
-const fadeUp = (delay = 0) => ({
-  initial:    { opacity: 0, y: 40 },
-  animate:    { opacity: 1, y: 0  },
-  transition: { duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] },
-})
 
 export default function GalaxyAnimation({ dark = true }) {
   const canvasRef = useRef(null)
@@ -400,130 +352,20 @@ export default function GalaxyAnimation({ dark = true }) {
         <div className="absolute inset-0 dark:from-blue-950/20 dark:via-transparent dark:to-blue-950/10 pointer-events-none" />
       )}
 
-      {/* Content overlay */}
-      <div className="container-narrow px-6 text-center relative z-10">
-
-        {/* Badge */}
-        <motion.div {...fadeUp(0.1)} className="mb-6 flex justify-center">
-          <motion.span
-            animate={{ scale: [1, 1.04, 1] }}
-            transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-            className="tag text-xs tracking-widest uppercase"
-          >
-            ✨ Open to Internships &amp; Research
-          </motion.span>
-        </motion.div>
-
-        {/* Name */}
-        <motion.h1
-          {...fadeUp(0.2)}
-          className="font-serif text-5xl sm:text-6xl md:text-7xl font-semibold leading-tight mb-6
-                     text-[var(--color-text)] dark:text-white"
-        >
-          <span className="text-blue-600 dark:text-blue-300">Md. </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 
-                          dark:from-blue-400 dark:to-purple-400">
-            Mahi
-          </span>
-          <br />
-          <span className="text-blue-600 dark:text-blue-300">Alam </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600
-                          dark:from-blue-400 dark:to-purple-400">
-            Dipu
-          </span>
-        </motion.h1>
-
-        {/* Typewriter role row */}
-        <motion.div
-          {...fadeUp(0.3)}
-          className="flex items-center justify-center flex-wrap gap-x-3 gap-y-1
-                     text-lg sm:text-xl text-blue-700 dark:text-blue-200 font-medium mb-4"
-          style={{ minHeight: '2rem' }}
-        >
-          <TypewriterRoles />
-          <span className="text-blue-500 dark:text-blue-300 select-none">·</span>
-          <span>CSE @ RUET</span>
-        </motion.div>
-
-        {/* Tagline */}
-        <motion.p
-          {...fadeUp(0.38)}
-          className="text-base text-blue-700 dark:text-blue-200 mb-11 font-light italic font-serif"
-        >
-          "{personal.heroTagline}"
-        </motion.p>
-
-        {/* CTA buttons */}
-        <motion.div {...fadeUp(0.48)} className="flex flex-wrap gap-4 justify-center mb-12">
-          <Link to="/about">
-            <motion.div
-              whileHover={{ scale: 1.06, y: -3, boxShadow: '0 20px 40px rgba(59,130,246,0.4)' }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3.5 rounded-full bg-blue-600 dark:bg-blue-500 text-white
-                         text-sm font-semibold shadow-lg shadow-blue-500/40 hover:bg-blue-700 dark:hover:bg-purple-600 
-                         transition-all duration-300 cursor-pointer"
-            >
-              View Profile
-            </motion.div>
-          </Link>
-          <Link to="/contact">
-            <motion.div
-              whileHover={{ scale: 1.06, y: -3 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3.5 rounded-full border-2 border-blue-600 dark:border-blue-400
-                         text-blue-700 dark:text-blue-200 text-sm font-semibold
-                         hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white transition-all duration-300 cursor-pointer"
-            >
-              Contact Me
-            </motion.div>
-          </Link>
-        </motion.div>
-
-        {/* Social icons */}
-        <motion.div {...fadeUp(0.58)} className="flex gap-5 justify-center">
-          {[
-            { icon: <Github size={19} />,   href: personal.github,             label: 'GitHub'   },
-            { icon: <Linkedin size={19} />, href: personal.linkedin,            label: 'LinkedIn' },
-            { icon: <Mail size={19} />,     href: `mailto:${personal.email}`,   label: 'Email'    },
-          ].map(s => (
-            <motion.a
-              key={s.label}
-              href={s.href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={s.label}
-              whileHover={{ scale: 1.2, y: -4 }}
-              whileTap={{ scale: 0.9 }}
-              className="w-11 h-11 rounded-full flex items-center justify-center
-                         text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-100 
-                         backdrop-blur-sm bg-blue-500/10 dark:bg-blue-500/20 
-                         transition-all duration-300 border border-blue-400/40 dark:border-blue-400/30"
-            >
-              {s.icon}
-            </motion.a>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Scroll indicator */}
-      <Link to="/#about-home">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.6 }}
-          className="absolute bottom-10 flex flex-col items-center gap-2
-                     text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-100 transition-colors cursor-pointer"
-          aria-label="Scroll down"
-        >
-          <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">Scroll</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-          >
-            <ArrowDown size={18} />
-          </motion.div>
-        </motion.div>
-      </Link>
+      <HeroContent
+        nameClassName="font-serif text-5xl sm:text-6xl md:text-7xl font-semibold leading-tight mb-6 text-[var(--color-text)] dark:text-white"
+        roleClassName="flex items-center justify-center flex-wrap gap-x-3 gap-y-1 text-lg sm:text-xl text-blue-700 dark:text-blue-200 font-medium mb-4"
+        taglineClassName="text-base text-blue-700 dark:text-blue-200 mb-11 font-light italic font-serif"
+        primaryButtonClassName="px-8 py-3.5 rounded-full border-2 border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-200 text-sm font-semibold hover:bg-blue-600 dark:hover:bg-blue-900 hover:text-white transition-all duration-300 cursor-pointer"
+        secondaryButtonClassName="px-8 py-3.5 rounded-full border-2 border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-200 text-sm font-semibold hover:bg-blue-600 dark:hover:bg-blue-900 hover:text-white transition-all duration-300 cursor-pointer"
+        socialButtonClassName="w-11 h-11 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-100 backdrop-blur-sm bg-blue-500/10 dark:bg-blue-500/20 transition-all duration-300 border border-blue-400/40 dark:border-blue-400/30"
+        scrollClassName="absolute bottom-10 flex flex-col items-center gap-2 text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-100 transition-colors cursor-pointer"
+        scrollTo="/#about-home"
+        scrollLabel="Scroll down"
+        accentClassName="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400"
+        nameToneClassName="text-blue-600 dark:text-blue-300"
+        separatorClassName="text-blue-500 dark:text-blue-300 select-none"
+      />
     </section>
   )
 }

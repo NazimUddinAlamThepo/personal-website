@@ -16,6 +16,9 @@ import ResearchPage   from './pages/Research'
 import CertificationsPage from './pages/Certifications'
 import LearningPage   from './pages/Learning'
 import ContactPage    from './pages/Contact'
+import DeepFocusPage  from './pages/DeepFocus'
+import DeepFocusActivePage from './pages/DeepFocusActive'
+import DeepFocusCompletePage from './pages/DeepFocusComplete'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -31,23 +34,40 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <ScrollProgress />
+      <AppShell dark={dark} toggle={toggle} />
+    </BrowserRouter>
+  )
+}
+
+function AppShell({ dark, toggle }) {
+  const { pathname } = useLocation()
+  const isDeepFocusRoute = pathname.startsWith('/deep-focus')
+  const deepFocusContentClass = isDeepFocusRoute ? 'pt-4 sm:pt-6' : ''
+
+  return (
+    <>
+      {!isDeepFocusRoute && <ScrollProgress />}
       <Navbar dark={dark} toggle={toggle} />
 
-      <Routes>
-        <Route path="/"               element={<Home dark={dark} />}              />
-        <Route path="/about"          element={<AboutPage />}         />
-        <Route path="/skills"         element={<SkillsPage />}        />
-        <Route path="/projects"       element={<ProjectsPage />}      />
-        <Route path="/education"      element={<EducationPage />}     />
-        <Route path="/research"       element={<ResearchPage />}      />
-        <Route path="/certifications" element={<CertificationsPage />}/>
-        <Route path="/learning"       element={<LearningPage />}      />
-        <Route path="/contact"        element={<ContactPage />}       />
-      </Routes>
+      <div className={deepFocusContentClass}>
+        <Routes>
+          <Route path="/"               element={<Home dark={dark} />}              />
+          <Route path="/about"          element={<AboutPage />}         />
+          <Route path="/skills"         element={<SkillsPage />}        />
+          <Route path="/projects"       element={<ProjectsPage />}      />
+          <Route path="/education"      element={<EducationPage />}     />
+          <Route path="/research"       element={<ResearchPage />}      />
+          <Route path="/certifications" element={<CertificationsPage />}/>
+          <Route path="/learning"       element={<LearningPage />}      />
+          <Route path="/contact"        element={<ContactPage />}       />
+          <Route path="/deep-focus"     element={<DeepFocusPage />}     />
+          <Route path="/deep-focus/active" element={<DeepFocusActivePage />} />
+          <Route path="/deep-focus/complete" element={<DeepFocusCompletePage />} />
+        </Routes>
+      </div>
 
-      <Footer />
-      <BackToTop />
-    </BrowserRouter>
+      {!isDeepFocusRoute && <Footer />}
+      {!isDeepFocusRoute && <BackToTop />}
+    </>
   )
 }
